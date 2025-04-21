@@ -1,13 +1,7 @@
 // STATION PROCESS
 #include "common.h"
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <unistd.h>
-#include <sys/socket.h>
-#include <sys/un.h>
+#include "wrapsock.h"
 #include <fcntl.h>
-#include <time.h>
 
 void wait_slot(int slots) {
     usleep(slots * SLOT_DURATION_MS * 1000);
@@ -31,8 +25,9 @@ int main(int argc, char *argv[]) {
     FILE *f = fopen(argv[2], "r");
     if (!f) exit(1);
 
-    int sockfd = socket(AF_UNIX, SOCK_DGRAM, 0);
+    int sockfd = Socket(AF_UNIX, SOCK_DGRAM, 0);
     struct sockaddr_un addr;
+    bzero(&addr, sizeof(addr));
     addr.sun_family = AF_UNIX;
     strcpy(addr.sun_path, CBP_SOCKET_PATH);
 
@@ -46,11 +41,11 @@ int main(int argc, char *argv[]) {
         FramePart p2 = {id, dst, frame, 2, "Data2"};
 
         log_event(id, "Send part 1");
-        sendto(sockfd, &p1, sizeof(p1), 0, (struct sockaddr*)&addr, sizeof(addr));
+        Sendto(sockfd, &p1, sizeof(p1), 0, (struct sockaddr*)&addr, sizeof(addr));
 
         wait_slot(1);
 
-        if (rand() % 5 == 0) { // simulate collision randomly
+        if (rand() % 5 == 0) {
             log_event(id, "Collision detected, retrying");
             int backoff = rand() % (1 << (collision_count < 10 ? collision_count : 10));
             wait_slot(backoff);
@@ -59,7 +54,7 @@ int main(int argc, char *argv[]) {
         }
 
         log_event(id, "Send part 2");
-        sendto(sockfd, &p2, sizeof(p2), 0, (struct sockaddr*)&addr, sizeof(addr));
+        Sendto(sockfd, &p2, sizeof(p2), 0, (struct sockaddr*)&addr, sizeof(addr));
         frame++;
         collision_count = 0;
         wait_slot(1);
