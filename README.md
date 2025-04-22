@@ -52,9 +52,14 @@ mkdir -p logs
 
 ### 3. Launch the station processes (example for 8 stations)
 ```bash
-for i in {1..8}; do
-  ./station $i input/stationprocess$i.txt &
-done
+./station 1 input/stationprocess1.txt &
+./station 2 input/stationprocess2.txt &
+./station 3 input/stationprocess3.txt &
+./station 4 input/stationprocess4.txt &
+./station 5 input/stationprocess5.txt &
+./station 6 input/stationprocess6.txt &
+./station 7 input/stationprocess7.txt &
+./station 8 input/stationprocess8.txt &
 ```
 
 ---
