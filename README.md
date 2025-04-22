@@ -42,8 +42,8 @@ mkdir -p logs
 ./station 4 input/stationprocess4.txt &
 ./station 5 input/stationprocess5.txt &
 ./station 6 input/stationprocess6.txt &
-./station 7 input/stationprocess6.txt &
-./station 8 input/stationprocess6.txt &
+./station 7 input/stationprocess7.txt &
+./station 8 input/stationprocess8.txt &
 ```
 
 ## Output
