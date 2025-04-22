@@ -5,6 +5,7 @@
 
 FramePart buffer;
 int buffer_state = 0;
+int first_sender = -1;
 int logfd;
 
 void log_event(const char *msg) {
@@ -26,7 +27,6 @@ int main() {
     log_event("CBP started");
 
     FramePart part;
-    int first_sender = -1;
     while (1) {
         Recvfrom(sockfd, &part, sizeof(part), 0, NULL, NULL);
 
@@ -54,12 +54,16 @@ int main() {
             buffer_state = 0;
             first_sender = -1;
         } else {
-            snprintf(msg, sizeof(msg), "Inform Station %d, Station %d, a collision",
-                     first_sender, part.src_station);
-            log_event(msg);
+            if (first_sender != -1 && first_sender != part.src_station) {
+                snprintf(msg, sizeof(msg), "Inform Station %d, Station %d, a collision",
+                         first_sender, part.src_station);
+                log_event(msg);
+            } else {
+                snprintf(msg, sizeof(msg), "Inform Station %d, a collision", part.src_station);
+                log_event(msg);
+            }
 
-            snprintf(msg, sizeof(msg), "A collision informed, wait for 1 time slot");
-            log_event(msg);
+            log_event("A collision informed, wait for 1 time slot");
 
             buffer_state = 0;
             first_sender = -1;
