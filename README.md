@@ -50,7 +50,7 @@ mkdir -p logs
 ./cbp &
 ```
 
-### 3. Launch the station processes (example for 8 stations)
+### 3. Launch the station processes
 ```bash
 ./station 1 input/stationprocess1.txt &
 ./station 2 input/stationprocess2.txt &
