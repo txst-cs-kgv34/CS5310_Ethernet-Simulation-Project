@@ -1,6 +1,7 @@
 // CBP: Communication Bus Process
 #include "common.h"
 #include "wrapsock.h"
+#include<stdlib.h>
 #include <fcntl.h>
 
 FramePart buffer;
@@ -35,14 +36,22 @@ int main() {
                  part.part, part.frame_number, part.src_station, part.dst_station);
         log_event(msg);
 
+        if (part.part != 1 && part.part != 2) {
+            snprintf(msg, sizeof(msg), "Invalid part number %d from Station %d", part.part, part.src_station);
+            log_event(msg);
+            continue;
+        }
+        
         if (buffer_state == 0 && part.part == 1) {
+            // First valid part received
             memcpy(&buffer, &part, sizeof(part));
             buffer_state = 1;
             first_sender = part.src_station;
+
         } else if (buffer_state == 1 && part.part == 2 &&
                    part.src_station == buffer.src_station &&
                    part.frame_number == buffer.frame_number) {
-
+            // Matching part 2 received
             snprintf(msg, sizeof(msg), "Transfer part 1 of frame %d from Station %d, to Station %d",
                      buffer.frame_number, buffer.src_station, buffer.dst_station);
             log_event(msg);
@@ -53,20 +62,27 @@ int main() {
 
             buffer_state = 0;
             first_sender = -1;
-        } else {
-            if (first_sender != -1 && first_sender != part.src_station) {
-                snprintf(msg, sizeof(msg), "Inform Station %d, Station %d, a collision",
-                         first_sender, part.src_station);
-                log_event(msg);
-            } else {
-                snprintf(msg, sizeof(msg), "Inform Station %d, a collision", part.src_station);
-                log_event(msg);
-            }
 
+        } else if (buffer_state == 1 && part.part == 1) {
+            // Two stations sending part 1 simultaneously
+            snprintf(msg, sizeof(msg), "Inform Station %d, Station %d, a collision",
+                     first_sender, part.src_station);
+            log_event(msg);
             log_event("A collision informed, wait for 1 time slot");
 
             buffer_state = 0;
             first_sender = -1;
+
+        } else if (buffer_state == 1 && part.part == 2) {
+            // Orphaned part 2 — discard, no matching part 1
+            snprintf(msg, sizeof(msg), "Dropped unmatched part 2 of frame %d from Station %d",
+                     part.frame_number, part.src_station);
+            log_event(msg);
+
+        } else if (buffer_state == 0 && part.part == 2) {
+            snprintf(msg, sizeof(msg), "Dropped unmatched part 2 of frame %d from Station %d",
+                     part.frame_number, part.src_station);
+            log_event(msg);
         }
     }
 

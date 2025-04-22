@@ -26,15 +26,24 @@ make
 ```
 
 ## How to Run
+### Create `logs` directory. 
 ```bash
 mkdir -p logs
+```
+### Run Communication Bus Process in the background.
+```bash
 ./cbp &
-./station 1 input/station1.txt &
-./station 2 input/station2.txt &
-./station 3 input/station3.txt &
-./station 4 input/station4.txt &
-./station 5 input/station5.txt &
-./station 6 input/station6.txt &
+```
+### Now run station processes to send data across the bus.
+```bash
+./station 1 input/stationprocess1.txt &
+./station 2 input/stationprocess2.txt &
+./station 3 input/stationprocess3.txt &
+./station 4 input/stationprocess4.txt &
+./station 5 input/stationprocess5.txt &
+./station 6 input/stationprocess6.txt &
+./station 7 input/stationprocess6.txt &
+./station 8 input/stationprocess6.txt &
 ```
 
 ## Output

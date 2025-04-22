@@ -9,7 +9,7 @@ void wait_slot(int slots) {
 
 void log_event(int id, const char *msg) {
     char filename[64];
-    snprintf(filename, sizeof(filename), "logs/station%d.log", id);
+    snprintf(filename, sizeof(filename), "logs/stationprocess%d.log", id);
     int fd = open(filename, O_WRONLY | O_CREAT | O_APPEND, 0666);
     dprintf(fd, "%s\n", msg);
     close(fd);
