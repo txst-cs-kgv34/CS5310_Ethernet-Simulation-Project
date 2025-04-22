@@ -44,7 +44,7 @@ int main(int argc, char *argv[]) {
         snprintf(msg, sizeof(msg), "Send part 1 of frame %d to Station %d", frame, dst);
         log_event(id, msg);
         Sendto(sockfd, &p1, sizeof(p1), 0, (struct sockaddr*)&addr, sizeof(addr));
-        wait_slot(1);
+        wait_slot(1);  // initial wait before part 2
 
         if (rand() % 5 == 0) {
             int slots = rand() % (1 << (collision_count < 10 ? collision_count : 10));
@@ -54,6 +54,9 @@ int main(int argc, char *argv[]) {
             collision_count++;
             continue;
         }
+
+        // Add random jitter before sending part 2
+        wait_slot(rand() % 3);  // wait an extra 0–2 slots randomly
 
         snprintf(msg, sizeof(msg), "Send part 2 of frame %d to Station %d", frame, dst);
         log_event(id, msg);
